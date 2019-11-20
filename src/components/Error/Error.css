@@ -1,0 +1,10 @@
+.error {
+  margin: 0 auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+.error svg {
+  width: 100%;
+  height: 100%;
+}

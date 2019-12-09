@@ -1,87 +1,80 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Error from '../Error';
 import Profile from '../Profile';
 import Loading from '../Loading';
 
 import './App.css';
 
-export default class App extends React.Component {
-  _abortController = {};
+const useDataApi = (calls) => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isInterrupted, setIsInterrupted] = useState(false);
+  const [count, setCounts] = useState(calls);
+  const [signal, setSignal] = useState({});
+  const [url, setUrl] = useState('https://randomuser.me/api/');
 
-  state = {
-    result: null,
-    loading: false,
-    error: null,
-    hasError: false,
-    isInterrupted: false
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsError(false);
+      setIsLoading(true);
+      setIsInterrupted(false);
+      setData(null);
 
-  getResponse = async (url, signal) => {
-    return await fetch(url, { signal }).then(res => res.json())
-  }
-
-  getRandomUser = () => {
-    this.setState({
-      loading: true,
-      result: null,
-      isInterrupted: false
-    });
-
-    this._abortController = new AbortController();
-
-    this.getResponse('https://randomuser.me/api/', this._abortController.signal)
-      .then((result) => {
-        if (this.state.loading) {
-          this.setState({
-            result: JSON.stringify(result.results[0]),
-            loading: false
-          })
-        }
-      })
-      .catch(err => {
-        if(err.name === 'AbortError') {
-          this.setState({
-            isInterrupted: true
-          })
-          console.error(err);
-          return;
-        };
-
-        this.setState({
-          error: err,
-          hasError: true
+      await fetch(url, signal)
+        .then(result => result.json())
+        .then(result => {
+          setData(result.results[0]);
         })
-      })
-  }
-
-  componentDidMount() {
-    this.getRandomUser(this._abortController.signal);
-  }
-
-  componentWillUnmount() {
-    this.setState({
-      loading: false
-    })
-  }
-
-  render() {
-    if(this.state.hasError) {
-			return <Error/>;
+        .catch(error =>  {
+          if(error.name === 'AbortError') {
+            setIsInterrupted(true);
+            console.error(error);
+            return;
+          } 
+          setIsError(true);
+        })
     }
-    
-    const { result, loading, isInterrupted } = this.state;
+    fetchData();
+  }, [count]);
 
-    return (
-      <div className="app">
-        <div className="app__buttons">
-          <button className="app__button" onClick={this.getRandomUser}>Random User</button>
-          {!isInterrupted && 
-            <button className="app__button" 
-              onClick={() => this._abortController.abort()}
-              disabled={!loading}>Break connection</button>}
-        </div>
-        {loading && !result ? <Loading/> : <Profile response={result}/>}
-      </div>
-    );
+  return [{ data, isLoading, isError, isInterrupted }, setCounts, setSignal];
+};
+
+export default function App() {
+  let _abortController = {};
+  const [count, setCount] = useState(0);
+  const [{ data, isLoading, isError, isInterrupted }, setCounts, setSignal] = useDataApi(count);
+
+  useEffect(() => {
+    setCounts(count);
+
+    return () => {
+      _abortController = new AbortController();
+      _abortController.abort();
+      setSignal(_abortController.abort());
+    };
+  }, [count, data])
+
+  function handleAbortRequest() {
+    _abortController = new AbortController();
+    _abortController.abort();
+    setSignal(_abortController.abort());
   }
+
+  if(isError) {
+    return <Error/>;
+  }
+  
+  return (
+    <div className="app">
+      <div className="app__buttons">
+        <button className="app__button" onClick={() => setCount(count + 1)}>Random User</button>
+        {!isInterrupted && 
+          <button className="app__button" 
+            disabled={!isLoading} onClick={handleAbortRequest}>Break connection</button>}
+      </div>
+      {isLoading && !data ? <Loading/> : <Profile response={data}/>}
+    </div>
+  );
 }

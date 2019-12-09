@@ -1,87 +1,68 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Error from '../Error';
 import Profile from '../Profile';
 import Loading from '../Loading';
 
 import './App.css';
 
-export default class App extends React.Component {
-  _abortController = {};
+export default function App() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [isError, setIsError] = useState(false);
+  const [isAborted, setIsAborted] = useState(false);
+  const [signal, setSignal] = useState({});
+  const [countOfClicks, setCountOfClicks] = useState(0);
 
-  state = {
-    result: null,
-    loading: false,
-    error: null,
-    hasError: false,
-    isInterrupted: false
-  }
-
-  getResponse = async (url, signal) => {
-    return await fetch(url, { signal }).then(res => res.json())
-  }
-
-  getRandomUser = () => {
-    this.setState({
-      loading: true,
-      result: null,
-      isInterrupted: false
-    });
-
-    this._abortController = new AbortController();
-
-    this.getResponse('https://randomuser.me/api/', this._abortController.signal)
-      .then((result) => {
-        if (this.state.loading) {
-          this.setState({
-            result: JSON.stringify(result.results[0]),
-            loading: false
-          })
-        }
-      })
-      .catch(err => {
-        if(err.name === 'AbortError') {
-          this.setState({
-            isInterrupted: true
-          })
-          console.error(err);
-          return;
-        };
-
-        this.setState({
-          error: err,
-          hasError: true
-        })
-      })
-  }
-
-  componentDidMount() {
-    this.getRandomUser(this._abortController.signal);
-  }
-
-  componentWillUnmount() {
-    this.setState({
-      loading: false
-    })
-  }
-
-  render() {
-    if(this.state.hasError) {
-			return <Error/>;
-    }
+  useEffect(() => {
+    const controller = new AbortController();
     
-    const { result, loading, isInterrupted } = this.state;
+    setSignal(controller.signal);
+    setIsLoading(true);
+    setIsError(false);
 
-    return (
+    const fetchData = async () => {
+      fetch('https://randomuser.me/api/', controller.signal)
+        .then(result => result.json())
+        .then(result => {
+          setIsLoading(false);
+          setData(result.results[0])
+        })
+        .catch(error => {
+          if(error.name === 'AbortError') {
+            console.error('User aborted the request...');
+          }
+          console.error(error);
+          setIsError(true)
+        })
+    }
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+      setData(null);
+    }
+  }, [countOfClicks, isAborted]);
+
+  function handleGetRandomUser() {
+    setCountOfClicks(countOfClicks + 1);
+    setIsAborted(false);
+  }
+
+  function handleAbortRequest() {
+    setIsAborted(true);
+  }
+  
+  return (
+    <>
+      {isError && <Error/>}
       <div className="app">
         <div className="app__buttons">
-          <button className="app__button" onClick={this.getRandomUser}>Random User</button>
-          {!isInterrupted && 
-            <button className="app__button" 
-              onClick={() => this._abortController.abort()}
-              disabled={!loading}>Break connection</button>}
+          <button className="app__button" onClick={handleGetRandomUser}>Random User</button>
+          {!isAborted && <button className="app__button" disabled={!isLoading} onClick={handleAbortRequest}>Break connection</button>}
         </div>
-        {loading && !result ? <Loading/> : <Profile response={result}/>}
+        {isLoading || isAborted ? <Loading/> : <Profile response={data}/>}
       </div>
-    );
-  }
+    </>
+  );
 }

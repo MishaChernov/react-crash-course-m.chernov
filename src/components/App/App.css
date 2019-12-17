@@ -6,30 +6,3 @@
   flex-wrap: wrap;
   padding: 50px;
 }
-
-.app__buttons {
-  display: flex;
-  margin-bottom: 40px;
-}
-
-.app__button {
-  width: 200px;
-  height: 40px;
-  margin: 0 10px;
-  outline: none;
-  background: none;
-  background-color: #e7e7e7;
-  transition-property: color, background-color;
-  transition-duration: 250ms;
-  transition-timing-function: ease-in-out;
-  cursor: pointer;
-}
-
-.app__button:not(:disabled):hover {
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-}
-
-.app__button:disabled {
-  cursor: default;
-}

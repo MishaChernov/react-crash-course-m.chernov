@@ -3,11 +3,11 @@ import React from 'react';
 import {ReactComponent as ErrorIcon} from './Error.svg';
 import './Error.css';
 
-function Error() {
+function Error(props) {
   return (
     <div className="error">
       <ErrorIcon/>
-      <h1>Something went wrong...</h1>
+      <h1>{props.message}</h1>
     </div>
   )
 }

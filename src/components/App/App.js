@@ -5,76 +5,64 @@ import Loading from '../Loading';
 
 import './App.css';
 
-const useDataApi = (calls) => {
-  const [data, setData] = useState(null);
+export default function App() {
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(null);
   const [isError, setIsError] = useState(false);
-  const [isInterrupted, setIsInterrupted] = useState(false);
-  const [count, setCounts] = useState(calls);
+  const [isAborted, setIsAborted] = useState(false);
   const [signal, setSignal] = useState({});
-  const [url, setUrl] = useState('https://randomuser.me/api/');
+  const [countOfClicks, setCountOfClicks] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsError(false);
-      setIsLoading(true);
-      setIsInterrupted(false);
-      setData(null);
+    const controller = new AbortController();
+    
+    setSignal(controller.signal);
+    setIsLoading(true);
+    setIsError(false);
 
-      await fetch(url, signal)
+    const fetchData = async () => {
+      fetch('https://randomuser.me/api/', controller.signal)
         .then(result => result.json())
         .then(result => {
-          setData(result.results[0]);
+          setIsLoading(false);
+          setData(result.results[0])
         })
-        .catch(error =>  {
+        .catch(error => {
           if(error.name === 'AbortError') {
-            setIsInterrupted(true);
-            console.error(error);
-            return;
-          } 
-          setIsError(true);
+            console.error('User aborted the request...');
+          }
+          console.error(error);
+          setIsError(true)
         })
     }
+
     fetchData();
-  }, [count]);
-
-  return [{ data, isLoading, isError, isInterrupted }, setCounts, setSignal];
-};
-
-export default function App() {
-  let _abortController = {};
-  const [count, setCount] = useState(0);
-  const [{ data, isLoading, isError, isInterrupted }, setCounts, setSignal] = useDataApi(count);
-
-  useEffect(() => {
-    setCounts(count);
 
     return () => {
-      _abortController = new AbortController();
-      _abortController.abort();
-      setSignal(_abortController.abort());
-    };
-  }, [count, data])
+      controller.abort();
+      setData(null);
+    }
+  }, [countOfClicks, isAborted]);
 
-  function handleAbortRequest() {
-    _abortController = new AbortController();
-    _abortController.abort();
-    setSignal(_abortController.abort());
+  function handleGetRandomUser() {
+    setCountOfClicks(countOfClicks + 1);
+    setIsAborted(false);
   }
 
-  if(isError) {
-    return <Error/>;
+  function handleAbortRequest() {
+    setIsAborted(true);
   }
   
   return (
-    <div className="app">
-      <div className="app__buttons">
-        <button className="app__button" onClick={() => setCount(count + 1)}>Random User</button>
-        {!isInterrupted && 
-          <button className="app__button" 
-            disabled={!isLoading} onClick={handleAbortRequest}>Break connection</button>}
+    <>
+      {isError && <Error/>}
+      <div className="app">
+        <div className="app__buttons">
+          <button className="app__button" onClick={handleGetRandomUser}>Random User</button>
+          {!isAborted && <button className="app__button" disabled={!isLoading} onClick={handleAbortRequest}>Break connection</button>}
+        </div>
+        {isLoading || isAborted ? <Loading/> : <Profile response={data}/>}
       </div>
-      {isLoading && !data ? <Loading/> : <Profile response={data}/>}
-    </div>
+    </>
   );
 }

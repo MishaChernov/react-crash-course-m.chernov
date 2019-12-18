@@ -3,10 +3,16 @@ import Error from '../Error';
 import Profile from '../Profile';
 import Loading from '../Loading';
 import Buttons from '../Buttons';
+import Switcher from '../Switcher';
 
 import './App.css';
 
+import withTheme, {themes} from '../withTheme/withTheme';
+
+// const withTheme = React.createContext('dark');
+
 export default function App() {
+  const [theme, setTheme] = useState('light');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -56,16 +62,25 @@ export default function App() {
   
   return (
     <>
-      {isError && <Error message={errorMessage}/>}
-      <div className="app">
-        <Buttons
-          isLoading={isLoading} 
-          isAborted={isAborted}
-          setIsAborted={setIsAborted}
-          countOfClicks={countOfClicks}
-          setCountOfClicks={setCountOfClicks}/>
-        {isLoading || isAborted ? <Loading/> : <Profile response={data}/>}
-      </div>
+      <Switcher setTheme={setTheme}/>
+
+      <withTheme.Provider value={theme}>
+        <div className="app container" style={{backgroundColor: themes[theme].background,
+                                               color: themes[theme].foreground}}>
+          {isError && 
+          <Error message={errorMessage} />}
+
+          <Buttons
+            isLoading={isLoading} 
+            isAborted={isAborted}
+            setIsAborted={setIsAborted}
+            countOfClicks={countOfClicks}
+            setCountOfClicks={setCountOfClicks}/>
+
+          {isLoading || isAborted ? 
+          <Loading/> : <Profile response={data} />}
+        </div>
+      </withTheme.Provider>
     </>
   );
 }

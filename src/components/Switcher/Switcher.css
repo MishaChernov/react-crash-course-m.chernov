@@ -1,0 +1,44 @@
+.switcher {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+.switcher__label {
+  display: flex;
+  width: 100px;
+  height: 35px;
+  overflow: hidden;
+  border: 1px solid #adadad;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.switcher__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 100px;
+  flex-basis: 100px;
+  transition-property: transform;
+  transition-duration: 250ms;
+  transition-timing-function: ease-in-out;
+  user-select: none;
+}
+
+.switcher__item--light {
+  background-color: #e6e6e6;
+  color: #333333;
+  box-shadow: inset -10px 0 0 #ffffff;
+}
+
+.switcher__item--dark {
+  background-color: #333333;
+  color: #ffffff;
+  box-shadow: inset 10px 0 0 #ffffff;
+}
+
+.switcher__control:checked ~ .switcher__label .switcher__item {
+  transform: translateX(-100%);
+}

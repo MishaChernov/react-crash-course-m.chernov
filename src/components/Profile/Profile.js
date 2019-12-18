@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 
+import withTheme, {themes} from '../withTheme/withTheme.js';
 import './Profile.css';
 
 export default function Profile(props) {
@@ -8,6 +9,7 @@ export default function Profile(props) {
   const [email, setEmail] = useState(null);
   const [age, setAge] = useState(null);
   const [picture, setPicture] = useState(null);
+  const theme = useContext(withTheme);
 
   useEffect(() => {
     const res = props.response;
@@ -27,7 +29,8 @@ export default function Profile(props) {
       <img className="profile__image" 
         src={picture} 
         alt={`On the picture is beautiful ${gender} ${name}`}
-        title={`On the picture is beautiful ${gender} ${name}`}/>
+        title={`On the picture is beautiful ${gender} ${name}`}
+        style={{boxShadow: `5px 5px 10px 0 ${themes[theme].imageShadow}`}}/>
       <h3 className="profile__name">{name} {age}</h3>
       <p className="profile__email">{email}</p>
     </section>

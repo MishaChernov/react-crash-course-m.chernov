@@ -9,8 +9,6 @@ import './App.css';
 
 import withTheme, {themes} from '../withTheme/withTheme';
 
-// const withTheme = React.createContext('dark');
-
 export default function App() {
   const [theme, setTheme] = useState('light');
   const [isLoading, setIsLoading] = useState(false);

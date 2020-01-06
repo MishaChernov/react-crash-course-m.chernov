@@ -6,6 +6,9 @@
 .profile__image {
   box-shadow: 10px 10px 10px 0 rgba(0, 0, 0, 0.5);
   transition: box-shadow 500ms ease-in-out;
+  width: 128px;
+  height: 128px;
+  background-color: #e7e7e7;
 }
 
 .profile__name {

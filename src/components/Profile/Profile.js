@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState, useContext, Suspense} from 'react';
 
 import withTheme, {themes} from '../withTheme/withTheme.js';
 import './Profile.css';
@@ -27,7 +27,7 @@ export default function Profile(props) {
   return (
     <section className="profile">
       <img className="profile__image" 
-        src={picture} 
+        src={picture}
         alt={`On the picture is beautiful ${gender} ${name}`}
         title={`On the picture is beautiful ${gender} ${name}`}
         style={{boxShadow: `5px 5px 10px 0 ${themes[theme].imageShadow}`}}/>

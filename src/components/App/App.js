@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, lazy, Suspense} from 'react';
 import Error from '../Error';
-import Profile from '../Profile';
 import Loading from '../Loading';
 import Buttons from '../Buttons';
+import Portal from '../Portal';
 import Switcher from '../Switcher';
 
 import './App.css';
-
 import withTheme, {themes} from '../withTheme/withTheme';
+const Profile = lazy(() => import('../Profile'));
 
 export default function App() {
   const [theme, setTheme] = useState('light');
@@ -60,7 +60,9 @@ export default function App() {
   
   return (
     <>
-      <Switcher setTheme={setTheme}/>
+      <Portal>
+        <Switcher setTheme={setTheme}/>
+      </Portal>
 
       <withTheme.Provider value={theme}>
         <div className="app container" style={{backgroundColor: themes[theme].background,
@@ -75,8 +77,10 @@ export default function App() {
             countOfClicks={countOfClicks}
             setCountOfClicks={setCountOfClicks}/>
 
-          {isLoading || isAborted ? 
-          <Loading/> : <Profile response={data} />}
+          <Suspense fallback={<Loading/>}>
+            {!isLoading && !isAborted ? 
+            <Profile response={data}/> : <Loading/>} 
+          </Suspense>
         </div>
       </withTheme.Provider>
     </>

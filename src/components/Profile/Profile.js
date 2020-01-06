@@ -26,11 +26,13 @@ export default function Profile(props) {
 
   return (
     <section className="profile">
-      <img className="profile__image" 
+      <div className="profile__image-placeholder">
+        <img className="profile__image" 
         src={picture}
         alt={`On the picture is beautiful ${gender} ${name}`}
         title={`On the picture is beautiful ${gender} ${name}`}
         style={{boxShadow: `5px 5px 10px 0 ${themes[theme].imageShadow}`}}/>
+      </div>
       <h3 className="profile__name">{name} {age}</h3>
       <p className="profile__email">{email}</p>
     </section>

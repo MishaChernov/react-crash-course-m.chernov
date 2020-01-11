@@ -1,0 +1,40 @@
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.buttons__btn {
+  width: 200px;
+  height: 40px;
+  margin: 10px 10px;
+  outline: none;
+  background: none;
+  background-color: #e7e7e7;
+  border-radius: 5px;
+  border: 1px solid #cdcaca;
+  transition-property: color, background-color;
+  transition-duration: 250ms;
+  transition-timing-function: ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+.buttons__btn:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+
+.buttons__btn[disabled],
+.buttons__btn[aria-disabled=true] {
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.buttons__btn:focus {
+  box-shadow: 0 0 0 3px rgba(0,123,255,.5);
+}

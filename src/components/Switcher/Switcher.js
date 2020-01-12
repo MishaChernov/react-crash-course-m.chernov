@@ -1,9 +1,12 @@
 import React, {useState, useEffect, ReactDOM} from 'react';
+import {connect} from 'react-redux';
+import {appReducer, changeTheme} from '../Redux/Reducer';
 
 import './Switcher.css';
 
-export default function Switcher(props) {
+function Switcher(props) {
   const [isChecked, setIsChecked] = useState(false);
+  const {theme} = props;
 
   function handleChecked(e) {
     setIsChecked(e.target.checked);
@@ -11,14 +14,15 @@ export default function Switcher(props) {
 
   useEffect(() => {
     if(isChecked) {
-      props.setTheme('dark');
+      props.dispatch(changeTheme('dark'));
     } else {
-      props.setTheme('light');
+      props.dispatch(changeTheme('light'));
     }
   }, [isChecked])
 
   return (
     <section className="switcher">
+      {theme}
       <input className="switcher__control  hidden" id="switcher-control" type="checkbox" name="switcher" defaultChecked={false} onChange={handleChecked}/>
 
       <label className="switcher__label" htmlFor="switcher-control">
@@ -28,3 +32,11 @@ export default function Switcher(props) {
     </section>
   )
 }
+
+function mapStateToProps(state) {
+  return {
+    theme: state.theme
+  }
+}
+
+export default connect(mapStateToProps)(Switcher);

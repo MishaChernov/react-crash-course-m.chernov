@@ -1,30 +1,25 @@
 import Types from './Types';
 
-export const changeTheme = (value) => ({
-  type: 'CHANGE_APP_THEME',
-  payload: {
-    theme: value
-  }
-})
+const initialState = {
+  theme: 'light',
+}
 
-export const appReducer = (state, action) => {
+export const appReducer = (state = initialState, action) => {
   switch(action.type) {
-    case Types.GET_APP_THEME: {
-      return {
-        ...state,
-        theme: action.payload 
-      }
-    }
     case Types.CHANGE_APP_THEME: {
       return {
         ...state,
-        theme: action.payload.theme
+        theme: action.payload
       }
     }
     default: return state
   }
 }
 
-export const state = {
-  theme: 'light',
+export const changeTheme = (value) => {
+
+  return {
+    type: 'CHANGE_APP_THEME',
+    payload: value
+  }
 }

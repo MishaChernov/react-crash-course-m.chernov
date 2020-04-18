@@ -6,7 +6,7 @@ import Portal from '../Portal';
 import Switcher from '../Switcher';
 
 import store from '../Redux/Store';
-import {Provider, connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 import './App.css';
 import Themes from '../Themes';
@@ -20,7 +20,6 @@ function App(props) {
   const [isAborted, setIsAborted] = useState(false);
   const [signal, setSignal] = useState({});
   const [countOfClicks, setCountOfClicks] = useState(0);
-  const theme = 'light';
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,13 +62,13 @@ function App(props) {
   }, [countOfClicks, isAborted]);
   
   return (
-    <Provider store={store}>
+    <>
       <Portal>
         <Switcher/>
       </Portal>
 
-      <div className="app container" style={{backgroundColor: Themes[theme].background,
-                                            color: Themes[theme].foreground}}>
+      <div className="app container" style={{backgroundColor: Themes[props.theme].background,
+                                            color: Themes[props.theme].foreground}}>
         {isError && 
         <Error message={errorMessage}/>}
 
@@ -85,7 +84,7 @@ function App(props) {
           <Profile response={data}/> : <Loading/>} 
         </Suspense>
       </div>
-    </Provider>
+    </>
   );
 }
 

@@ -5,12 +5,14 @@ import Buttons from '../Buttons';
 import Portal from '../Portal';
 import Switcher from '../Switcher';
 
+import store from '../Redux/Store';
+import { connect } from 'react-redux';
+
 import './App.css';
-import withTheme, {themes} from '../withTheme/withTheme';
+import Themes from '../Themes';
 const Profile = lazy(() => import('../Profile'));
 
-export default function App() {
-  const [theme, setTheme] = useState('light');
+function App(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -51,6 +53,7 @@ export default function App() {
     }
 
     fetchData();
+    console.log(store);
 
     return () => {
       controller.abort();
@@ -61,28 +64,34 @@ export default function App() {
   return (
     <>
       <Portal>
-        <Switcher setTheme={setTheme}/>
+        <Switcher/>
       </Portal>
 
-      <withTheme.Provider value={theme}>
-        <div className="app container" style={{backgroundColor: themes[theme].background,
-                                               color: themes[theme].foreground}}>
-          {isError && 
-          <Error message={errorMessage} />}
+      <div className="app container" style={{backgroundColor: Themes[props.theme].background,
+                                            color: Themes[props.theme].foreground}}>
+        {isError && 
+        <Error message={errorMessage}/>}
 
-          <Buttons
-            isLoading={isLoading} 
-            isAborted={isAborted}
-            setIsAborted={setIsAborted}
-            countOfClicks={countOfClicks}
-            setCountOfClicks={setCountOfClicks}/>
+        <Buttons
+          isLoading={isLoading} 
+          isAborted={isAborted}
+          setIsAborted={setIsAborted}
+          countOfClicks={countOfClicks}
+          setCountOfClicks={setCountOfClicks}/>
 
-          <Suspense fallback={<Loading/>}>
-            {!isLoading && !isAborted ? 
-            <Profile response={data}/> : <Loading/>} 
-          </Suspense>
-        </div>
-      </withTheme.Provider>
+        <Suspense fallback={<Loading/>}>
+          {!isLoading && !isAborted ? 
+          <Profile response={data}/> : <Loading/>} 
+        </Suspense>
+      </div>
     </>
   );
 }
+
+function mapStateToProps(state) {
+  return {
+    theme: state.theme
+  }
+} 
+
+export default connect(mapStateToProps)(App);

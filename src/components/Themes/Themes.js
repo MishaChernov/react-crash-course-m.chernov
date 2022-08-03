@@ -1,6 +1,4 @@
-import React from 'react';
-
-export const themes = {
+const Themes = {
   light: {
     foreground: '#000000',
     background: '#eeeeee',
@@ -13,6 +11,4 @@ export const themes = {
   },
 };
 
-const withTheme = React.createContext(themes.light);
-
-export default withTheme;
+export default Themes;
